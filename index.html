@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planificador Nutricional Semanal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; }
+        .tab-button.active { border-bottom: 2px solid #10b981; color: #10b981; }
+        .card { transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+
+    <div id="app" class="max-w-4xl mx-auto p-4 md:p-8">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Mi Plan Nutricional</h1>
+            <p class="text-gray-600">Gestión semanal de alimentación y recetas</p>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="flex flex-wrap gap-4 border-b border-gray-200 mb-6 pb-2">
+            <button onclick="renderView('menu', this)" class="tab-button active pb-2 font-semibold">Menú Semanal</button>
+            <button onclick="renderView('recetario', this)" class="tab-button pb-2 font-semibold text-gray-500 hover:text-green-600">Recetario</button>
+            <button onclick="renderView('dietas', this)" class="tab-button pb-2 font-semibold text-gray-500 hover:text-green-600">Dietas</button>
+            <button onclick="renderView('postres', this)" class="tab-button pb-2 font-semibold text-gray-500 hover:text-green-600">Postres</button>
+            <button onclick="renderView('guias', this)" class="tab-button pb-2 font-semibold text-gray-500 hover:text-green-600">Guías</button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <div id="content">
+            <!-- Content will be injected here via JavaScript -->
+        </div>
+    </div>
+
+        <script>
+        const appData = {
+            menu: {
+                "Lunes": { desayuno: "Huevos revueltos con tomate y chile verde, pan francés, café", almuerzo: "Arroz blanco con carne roja, ensalada de pepino, jugo de sandía" },
+                "Martes": { desayuno: "Sandwich de atún, té", almuerzo: "Carnes blancas a la plancha, frijoles, maíz dulce, jugo de melón" },
+                "Miércoles": { desayuno: "Tostadas americanas con lácteos", almuerzo: "Cerdo guisado, papa cocida, ensalada mixta, jugo de piña" },
+                "Jueves": { desayuno: "Tocino y huevos, café", almuerzo: "Pescado al vapor, arroz blanco, ensalada de tomate y chile rojo, agua de jamaica" },
+                "Viernes": { desayuno: "Sandwich de jamón y queso, té", almuerzo: "Carnes rojas, frijoles, maíz dulce, jugo de sandía" },
+                "Sábado": { desayuno: "Desayuno especial (huevos, tocino, pan francés)", almuerzo: "Pescado con ensalada fresca, arroz, jugo de melón" }
+            },
+            diets: {
+                libre: "Comida balanceada sin restricciones calóricas severas. Enfoque en nutrientes y porciones naturales.",
+                controlada: "Enfoque en porciones medidas: 100g proteína, 1/2 taza arroz, porción generosa de ensalada. Menos sal y grasas.",
+                estricta: "Alta densidad nutricional: Proteína magra (blanca/pescado), vegetales al vapor, carbohidratos complejos mínimos, cero azúcares refinados."
+            }
+        };
+
+        function renderView(view, element) {
+            const contentDiv = document.getElementById('content');
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            if (element) {
+                element.classList.add('active');
+            }
+
+            if (view === 'menu') {
+                contentDiv.innerHTML = `
+                    <div class="space-y-4">
+                        <label class="block text-sm font-medium text-gray-700">Selecciona el día:</label>
+                        <select id="daySelector" onchange="updateMenuDisplay()" class="w-full p-3 border rounded-lg bg-white shadow-sm">
+                            ${Object.keys(appData.menu).map(day => `<option value="${day}">${day}</option>`).join('')}
+                        </select>
+                        <div id="menuDisplay" class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"></div>
+                    </div>
+                `;
+                updateMenuDisplay();
+            } else if (view === 'recetario') {
+                contentDiv.innerHTML = `
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                            <h3 class="font-bold text-lg mb-2">Ingredientes Disponibles</h3>
+                            <ul class="text-sm text-gray-600 list-disc ml-5 space-y-1">
+                                <li>Carnes: Rojas, Blancas, Cerdo, Pescado, Atún, Tocino</li>
+                                <li>Base: Arroz blanco, Frijoles, Pan francés, Tostadas, Sandwich</li>
+                                <li>Vegetales: Pepino, Chile Verde/Rojo, Maíz, Papa, Tomate</li>
+                            </ul>
+                        </div>
+                        <div class="bg-green-50 p-6 rounded-xl border border-green-100">
+                            <h3 class="font-bold text-green-800 text-lg mb-2">¿Necesitas una receta?</h3>
+                            <p class="text-green-700 text-sm">Selecciona un ingrediente principal de la lista para ver sugerencias de preparación.</p>
+                        </div>
+                    </div>
+                `;
+            } else if (view === 'dietas') {
+                contentDiv.innerHTML = `
+                    <div class="grid gap-6">
+                        ${Object.entries(appData.diets).map(([key, val]) => `
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-l-4 border-l-green-500">
+                                <h3 class="capitalize font-bold text-xl mb-2 text-gray-800">${key}</h3>
+                                <p class="text-gray-600">${val}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (view === 'postres') {
+                contentDiv.innerHTML = `<div class="p-8 text-center bg-white rounded-xl shadow-sm"><p class="text-gray-500">Sección de postres: Frutas frescas, yogur con miel, o gelatina de frutas naturales.</p></div>`;
+            } else if (view === 'guias') {
+                contentDiv.innerHTML = `
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="font-bold text-lg mb-4">Guía paso a paso: Preparación saludable</h3>
+                        <ol class="list-decimal ml-5 space-y-2 text-gray-700">
+                            <li>Lavar y desinfectar vegetales (pepino, tomate, chiles).</li>
+                            <li>Preparar la proteína (cocción al vapor o plancha para evitar exceso de aceite).</li>
+                            <li>Porcionar el carbohidrato (arroz o pan) según tu tipo de dieta.</li>
+                            <li>Acompañar siempre con una bebida natural (limonada, jugo de sandía).</li>
+                        </ol>
+                    </div>
+                `;
+            }
+        }
+
+        function updateMenuDisplay() {
+            const day = document.getElementById('daySelector').value;
+            const data = appData.menu[day];
+            document.getElementById('menuDisplay').innerHTML = `
+                <h2 class="text-2xl font-bold mb-4 text-green-600">${day}</h2>
+                <div class="space-y-4">
+                    <div><span class="font-semibold block text-gray-700">Desayuno:</span> ${data.desayuno}</div>
+                    <div class="border-t pt-4"><span class="font-semibold block text-gray-700">Almuerzo:</span> ${data.almuerzo}</div>
+                </div>
+            `;
+        }
+
+        // Initialize view - Selecting the first button element for initial render
+        const initialButton = document.querySelector('.tab-button');
+        renderView('menu', initialButton);
+    </script>
+</body>
+</html>
